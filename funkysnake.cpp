@@ -58,11 +58,10 @@ struct Board {
 std::array<sf::Vertex, 4> quad(const sf::Vector2f pos, const sf::Vector2f size,
         const sf::Color color)
 {
-    const float x = size.x, y = size.y;
-    return std::array<sf::Vertex, 4>{
-        sf::Vertex{pos, color}, sf::Vertex{pos + sf::Vector2f{x, 0}, color},
+    return std::array<sf::Vertex, 4>{{
+        sf::Vertex{pos, color}, sf::Vertex{pos + sf::Vector2f{size.x,0}, color},
         sf::Vertex{pos + size, color},
-        sf::Vertex{pos + sf::Vector2f{0, x}, color}};
+        sf::Vertex{pos + sf::Vector2f{0, size.y}, color}}};
 }
 
 sf::VertexArray vertices(const Board & board) {
@@ -128,16 +127,16 @@ Board init_apple(const Board & board, const std::size_t seed) {
 
 Board update_snake(const Board & board, const sf::Vector2i dir) {
     auto next = board;
-    if (board.snake.front() == board.apple) {
-        next.rng_seed++;
-        next.snake.push_back(next.snake.back()); // counteract pop_back
-        return update_snake(init_apple(next, next.rng_seed), dir);
-    }
     if (dir != sf::Vector2i{0, 0} && dir != -1 * board.direction)
         next.direction = dir;
     next.snake.push_front(clamp(board.snake.front() + next.direction,
                           sf::Vector2i{COLUMNS, ROWS}));
-    next.snake.pop_back();
+    if (contains(next.snake, board.apple)) {
+        next.rng_seed++;
+        next = init_apple(next, next.rng_seed);
+    }
+    else
+        next.snake.pop_back();
     return next;
 }
 
