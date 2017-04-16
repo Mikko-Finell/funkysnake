@@ -117,8 +117,7 @@ Board init_apple(const Board & board, const std::size_t seed) {
                 available_cells.emplace_back(x, y);
         }
     }
-    std::mt19937 rng;
-    rng.seed(seed);
+    std::mt19937 rng{seed};
     std::uniform_int_distribution<int> dist(0, available_cells.size() - 1);
     auto _board = board;
     _board.apple = available_cells[dist(rng)];
@@ -129,7 +128,7 @@ Board update_snake(const Board & board, const sf::Vector2i dir) {
     auto next = board;
     if (dir != sf::Vector2i{0, 0} && dir != -1 * board.direction)
         next.direction = dir;
-    next.snake.push_front(clamp(board.snake.front() + next.direction,
+    next.snake.push_front(clamp(next.snake.front() + next.direction,
                           sf::Vector2i{COLUMNS, ROWS}));
     if (contains(next.snake, board.apple)) {
         next.rng_seed++;
