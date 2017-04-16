@@ -146,10 +146,7 @@ bool game_over(const Board & board) {
         if (*it == board.snake.front()) // crashed into itself
             return true;
     }
-    if (board.snake.size() + 1 == COLUMNS * ROWS) // win
-        return true;
-    else
-        return false;
+    return board.snake.size() + 1 == COLUMNS * ROWS; // win
 }
 
 int main() {
